@@ -1,0 +1,6 @@
+.gridnode {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1/1;
+  outline: 1px solid blue;
+}

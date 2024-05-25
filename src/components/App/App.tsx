@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <header className="App-header">
         Percolating Grid
       </header>
