@@ -1,13 +1,13 @@
 import { PercolatingGrid } from '../../components/PercolatingGrid/PercolatingGrid';
-import './App.css';
+import styles from './App.module.css';
 
 function App() {
   return (
     <div>
-      <header className="App-header">
+      <header className={styles.header}>
         Percolating Grid
       </header>
-      <main>
+      <main className={styles.main}>
         <PercolatingGrid />
       </main>
     </div>

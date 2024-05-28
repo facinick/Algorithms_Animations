@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import styles from "./GridNode.module.css";
 
 interface Props {
@@ -11,7 +12,7 @@ export const GridNode = ({id, parentId, open, onClick}: Props): JSX.Element => {
 
   return (
     <>
-      <div 
+      <motion.div 
       onClick={onClick}
       className={styles.gridnode}
       style={{
@@ -19,7 +20,7 @@ export const GridNode = ({id, parentId, open, onClick}: Props): JSX.Element => {
       }}
       >
         {id}
-      </div>
+      </motion.div>
     </>
   )
 }

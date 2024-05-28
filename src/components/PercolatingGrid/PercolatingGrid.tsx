@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import useSound from "use-sound";
+import waterDropSound from '../../assets/sounds/water_drop.mp3';
 import { Percolation } from "./Algorithm/Percolation";
 import { GridNode } from "./Node";
 import styles from "./PercolatingGrid.module.css";
@@ -16,7 +18,15 @@ export const PercolatingGrid = (): JSX.Element => {
 
   const [percolating, setPercolating] = useState<boolean>(false);
 
-  const percolation = useMemo(() =>  new Percolation(nRows, nCols), [])
+  const [playWaterDropSound] = useSound(waterDropSound, {
+    sprite: {
+      drop1: [400, 1000],
+      drop2: [1500, 2000],
+      drop3: [2700, 2300],
+    },
+  });
+
+  const percolation = useMemo(() =>  new Percolation(nRows, nCols), [nRows, nCols])
 
   const [id, setId] = useState<Array<number>>(() => percolation.getData());
 
@@ -28,9 +38,14 @@ export const PercolatingGrid = (): JSX.Element => {
   const GRID_HEIGHT = NODE_HEIGHT * nRows;
 
   const onGridNodeClick = (p: number) => {
-    percolation.openSite(p)
-    setId([...percolation.getData()])
-    setOpen([...percolation.getOpenData()])
+    if(!percolation.isOpen(p)) {
+      percolation.openSite(p)
+      playWaterDropSound({
+        id: "drop1"
+      })
+      setId([...percolation.getData()])
+      setOpen([...percolation.getOpenData()])
+    }
   }
 
   useEffect(() =>  {
