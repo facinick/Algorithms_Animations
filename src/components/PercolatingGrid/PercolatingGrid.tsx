@@ -1,14 +1,14 @@
-import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import useSound from "use-sound";
 import waterDropSound from '../../assets/sounds/water_drop.mp3';
 import { Percolation } from "./Algorithm/Percolation";
 import { GridNode } from "./Node";
 import styles from "./PercolatingGrid.module.css";
+import { Tree } from "./ResponsiveTree";
 
 const SETTINGS = {
-  ROWS: 12,
-  COLS: 15,
+  ROWS: 10,
+  COLS: 10,
 }
 
 export const PercolatingGrid = (): JSX.Element => {
@@ -36,8 +36,8 @@ export const PercolatingGrid = (): JSX.Element => {
   const [hoveredNode, setHoveredNode] = useState<number>(-1);
   const [hoveredNodeTimer, setHoveredNodeTimer] = useState<NodeJS.Timeout | null>(null);
 
-  const NODE_WIDTH = 50;
-  const NODE_HEIGHT = 50;
+  const NODE_WIDTH = 30;
+  const NODE_HEIGHT = 30;
   const GRID_WIDTH = NODE_WIDTH * nCols;
   const GRID_HEIGHT = NODE_HEIGHT * nRows;
 
@@ -55,6 +55,9 @@ export const PercolatingGrid = (): JSX.Element => {
   useEffect(() => {
     const isPercolating = percolation.isPercolating()
     setPercolating(isPercolating)
+    if(isPercolating) {
+     console.log(percolation.getPercolatingComponent())
+    }
   }, [open, percolation])
 
   const handleMouseEnter = (index: number) => {
@@ -91,23 +94,10 @@ export const PercolatingGrid = (): JSX.Element => {
         onMouseLeave={() => handleMouseLeave()}
       >
         {
-          id.map((node, index, id) => {
+          id.map((_, index, id) => {
             if (index !== 0 && index !== nLength - 1) {
               return (
-                <div
-
-                  style={{ position: "relative" }}>
-                  {hoveredNode === index && (
-                    <motion.div
-                      layoutId="hovered-node"
-                      className={styles['hovered-node']}
-                      style={{
-                        width: NODE_WIDTH,
-                        height: NODE_HEIGHT,
-                      }}
-                    />
-                  )}
-                  <GridNode
+                <GridNode
                     key={index}
                     onClick={() => onGridNodeClick(index)}
                     id={index}
@@ -116,12 +106,12 @@ export const PercolatingGrid = (): JSX.Element => {
                     onMouseEnter={() =>
                       handleMouseEnter(index)}
                   />
-                </div>
               )
             } else return null;
           })
         }
         {percolating && <span>Percolating!</span>}
+        <Tree data={{id: 1, children: []}} />
       </div>
     </>
   )

@@ -13,6 +13,8 @@ class WeightedQuickUnion {
   // keeps weight of tree with root at the item
   // = number of items with root as the node INDEX
   private weights: Array<number>;
+  // for visualisation, not required for this algorithm
+  // private tree: Map<number, Array<number>>;
 
   /*
     cost: n
@@ -20,6 +22,9 @@ class WeightedQuickUnion {
   constructor(n: number) {
     this.N = n;
     this.nComponents = n;
+
+    // not needed for this algorithm
+    // this.tree = new Map();
 
     this.id = new Array<number>(n).fill(0);
     this.id.forEach((_, index, array) => {
@@ -66,10 +71,16 @@ class WeightedQuickUnion {
     // p is in smaller tree, make p's root's parent q's root
     if(this.weights[rootP] < this.weights[rootQ]) {
       this.id[rootP] = rootQ
-      this.weights[rootQ] = this.weights[rootQ] + this.weights[rootP]
+      this.weights[rootQ] = this.weights[rootQ] + this.weights[rootP];
+
+      // Update tree structure
+      // this.tree.has(rootQ) ? this.tree.get(rootQ)?.push(rootP) : this.tree.set(rootQ, [rootP])
     } else {
       this.id[rootQ] = rootP
       this.weights[rootP] = this.weights[rootQ] + this.weights[rootP]
+
+      // Update tree structure
+      // this.tree.has(rootP) ? this.tree.get(rootP)?.push(rootQ) : this.tree.set(rootP, [rootQ])
     }
   }
 
@@ -89,6 +100,23 @@ class WeightedQuickUnion {
   public getData(): typeof this.id {
     return this.id
   }
+
+  public findComponent(p: number): Array<number> {
+    const rootP = this.find(p);
+    const component = [];
+
+    for (let i = 0; i < this.N; i++) {
+      if (this.find(i) === rootP) {
+        component.push(i);
+      }
+    }
+
+    return component;
+  }
+
+  // public getTree(): Map<number, Array<number>> {
+  //   return this.tree;
+  // }
 }
 
 export { WeightedQuickUnion };
