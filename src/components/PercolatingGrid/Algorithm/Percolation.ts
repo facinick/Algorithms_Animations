@@ -1,14 +1,20 @@
 import { WeightedQuickUnion } from "./WeightedQuickUnion";
 
+export enum SiteState {
+  OPEN="open",
+  CLOSED="closed",
+  FULL="full",
+}
+
 class Percolation {
 
   private ROWS: number;
   private COLS: number;
 
   private sites: WeightedQuickUnion
-  private open: Array<boolean>;
-  private full: Array<boolean>;
   private nSitesOpen: number = 0;
+
+  private siteState: Array<SiteState>;
 
   private TOP_VIRTUAL_SITE_INDEX: number;
   private BOTTOM_VIRTUAL_SITE_INDEX: number;
@@ -27,14 +33,12 @@ class Percolation {
     this.LAST_COL_INDEX = this.COLS-1;
     this.TOP_VIRTUAL_SITE_INDEX = 0;
     this.BOTTOM_VIRTUAL_SITE_INDEX = this.ROWS * this.COLS + 2 - 1;
-    
-    this.sites = new WeightedQuickUnion(this.ROWS * this.COLS + 2);
-    this.open = new Array<boolean>().fill(false)
-    this.open[this.TOP_VIRTUAL_SITE_INDEX] = true;
-    this.open[this.BOTTOM_VIRTUAL_SITE_INDEX] = true;
 
-    this.full = new Array<boolean>().fill(false)
-    this.full[this.TOP_VIRTUAL_SITE_INDEX] = true;
+    this.sites = new WeightedQuickUnion(this.ROWS * this.COLS + 2);
+
+    this.siteState = new Array<SiteState>(this.ROWS * this.COLS + 2).fill(SiteState.CLOSED)
+    this.siteState[this.TOP_VIRTUAL_SITE_INDEX] = SiteState.FULL;
+    this.siteState[this.BOTTOM_VIRTUAL_SITE_INDEX] = SiteState.OPEN;
   }
 
   public openSite(p: number): void {
@@ -42,9 +46,52 @@ class Percolation {
       return;
     }
 
-    this.open[p] = true;
+    this.siteState[p] = SiteState.OPEN;
     this.nSitesOpen += 1;
     this.unionWithOpenNeighbours(p)
+    this.flood(p)
+  }
+
+  // DFS Flood at p, if any neighbour is flooded, flood myself. Then flood all open neighbouts
+  private flood(p: number): void {
+
+    if(!this.shouldFlood(p)) {
+      return;
+    }
+
+    const neighbors = this.getNetighbours(p)
+
+    this.siteState[p] = SiteState.FULL;
+
+    for (const neighbor of Object.values(neighbors)) {
+      if (neighbor !== null && this.isOpen(neighbor) && !this.isFull(neighbor)) {
+        this.flood(neighbor);
+      }
+    }
+  }
+
+  private shouldFlood(p: number): boolean {
+    if(this.siteState[p] !== SiteState.OPEN) {
+      return false
+    }
+
+    const neighbors = this.getNetighbours(p)
+
+    for (const [position, id] of Object.entries(neighbors)) {
+
+      // top virtal site is always flooded
+      if((position === "top") && (id === null) && this.isFull(this.TOP_VIRTUAL_SITE_INDEX)) {
+        console.log(`flood: ${p} because of ${id}`)
+        return true
+      }
+
+      if (id !== null && this.isFull(id)) {
+        console.log(`flood: ${p} because of ${id}`)
+        return true
+      }
+    }
+
+    return false
   }
 
   public getNSitesOpen(): number {
@@ -108,7 +155,7 @@ class Percolation {
   }
 
   public isOpen(p: number): boolean  {
-    return this.open[p];
+    return (this.siteState[p] === SiteState.OPEN) || this.isFull(p);
   }
 
   public isPercolating(): boolean {
@@ -117,7 +164,7 @@ class Percolation {
 
   // a site is full, if any of it's neighbour is open and full.
   public isFull(p: number): boolean {
-    return this.sites.connected(p, this.TOP_VIRTUAL_SITE_INDEX)
+    return this.siteState[p] === SiteState.FULL;
   }
 
   public getPercolatingComponent(): number[] {
@@ -128,8 +175,8 @@ class Percolation {
     return this.sites.getData()
   }
 
-  public getOpenData(): Array<boolean> {
-    return this.open;
+  public getSiteState(){
+    return this.siteState;
   }
 }
 

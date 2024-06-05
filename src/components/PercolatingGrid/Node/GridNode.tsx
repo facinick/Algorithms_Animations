@@ -1,30 +1,31 @@
+import classNames from "classnames";
 import { motion } from "framer-motion";
+import { SiteState } from "../Algorithm/Percolation";
 import styles from "./GridNode.module.css";
 
 interface Props {
   id: number;
   parentId: number;
-  open: boolean;
+  siteState: SiteState;
   onClick: () => void
   onMouseEnter?: React.MouseEventHandler<HTMLDivElement> | undefined
   onMouseLeave?: React.MouseEventHandler<HTMLDivElement> | undefined
 }
 
-export const GridNode = ({id, parentId, open, onClick, onMouseEnter, onMouseLeave}: Props): JSX.Element => {
+export const GridNode = ({id, parentId, siteState, onClick, onMouseEnter, onMouseLeave}: Props): JSX.Element => {
+
+  // classNames
 
   return (
     <>
       <motion.div 
         onClick={onClick}
-        className={styles.gridnode}
+        className={classNames(styles.gridnode, styles[siteState])}
         layoutId="node"
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        style={{
-          backgroundColor: open ? "blue" : "grey"
-        }}
       >
-          {id}
+        {/* {id} */}
       </motion.div>
     </>
   )
